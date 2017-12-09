@@ -1,0 +1,440 @@
+Name: Sandeep Kumta Vishnu
+SBU Id: 111482809
+net Id: svishnu
+
+Please use sublime text or notepad++ to view this file.
+
+1. Network traffic analysis using tcpdump
+
+1.1 How many packets does the trace contain?
+Answer: 32664
+		Command used: tcpdump -n -r hw1.pcap | wc -l
+
+
+1.2 How many ARP and how many UDP packets?
+Answer: Number of ARP Packets: 11304
+		Command used: sudo tcpdump -n arp -r hw1.pcap | wc -l
+
+		Number of UDP Packets: 18382
+		Command used: sudo tcpdump -n udp -r hw1.pcap | wc -l
+
+
+1.3 How many packets were exchanged between 192.168.0.200 and 91.189.90.40?
+Answer: 28
+		Command used: sudo tcpdump -n "(ip src 192.168.0.200 && ip dst 91.189.90.40) || (ip src 91.189.90.40 && ip dst 192.168.0.200)" -r hw1.pcap | wc -l
+
+
+1.4 Print the unique source IP addresses found in the trace.
+Answer: Command used: sudo tcpdump -n ip -r hw1.pcap | cut -d' ' -f3 | cut -d'.' -f1-4 | sort | uniq
+		
+		Unique source IP address:
+		0.0.0.0
+		122.154.101.54
+		1.234.31.20
+		130.75.16.5
+		159.148.96.184
+		169.254.56.55
+		192.168.0.1
+		192.168.0.10
+		192.168.0.11
+		192.168.0.12
+		192.168.0.2
+		192.168.0.200
+		192.168.0.3
+		192.168.0.5
+		192.168.0.6
+		192.168.0.7
+		194.168.4.100
+		216.137.63.121
+		216.137.63.137
+		46.51.197.88
+		46.51.197.89
+		62.252.170.81
+		62.252.170.91
+		87.230.23.162
+		87.98.246.8
+		91.189.88.33
+		91.189.89.88
+		91.189.90.40
+		91.189.90.41
+		91.189.91.14
+		91.189.91.15
+		91.189.92.190
+		92.240.68.152
+
+1.5 Print the unique private network (according to RFC1918) source IP addresses found in the trace.
+Answer: Command used: sudo tcpdump -n src 'net 192.168.0.0/16 or net 172.16.0.0/12 or net 10.0.0.0/8' -r hw1.pcap | cut -d' ' -f3 | cut -d'.' -f1-4 | sort | uniq
+
+	192.168.0.1
+	192.168.0.10
+	192.168.0.11
+	192.168.0.12
+	192.168.0.2
+	192.168.0.200
+	192.168.0.3
+	192.168.0.5
+	192.168.0.6
+	192.168.0.7
+
+1.6 Print the unique destination IP addresses found in the trace.
+Answer: Command used: sudo tcpdump -n ip -r hw1.pcap | cut -d' ' -f5 | cut -d':' -f1 | cut -d'.' -f1-4 | sort | uniq
+
+		Unique destination IP addresses:
+		122.154.101.54
+		1.234.31.20
+		130.75.16.5
+		159.148.96.184
+		169.254.255.255
+		192.168.0.12
+		192.168.0.200
+		192.168.0.255
+		194.168.4.100
+		216.137.63.121
+		216.137.63.137
+		224.0.0.22
+		224.0.0.251
+		224.0.0.252
+		224.0.0.253
+		239.255.255.250
+		255.255.255.255
+		46.51.197.88
+		46.51.197.89
+		62.252.170.81
+		62.252.170.91
+		87.230.23.162
+		87.98.246.8
+		91.189.88.33
+		91.189.89.88
+		91.189.90.40
+		91.189.90.41
+		91.189.91.14
+		91.189.91.15
+		91.189.92.190
+		92.240.68.152
+
+1.7 What are the top-5 TCP and top-5 UDP destination ports?
+Answer: TOP 5 TCP ports
+		Command used: sudo tcpdump -n tcp -r hw1.pcap | cut -d' ' -f5 | cut -d':' -f1 | cut -d'.' -f5 | sort | uniq -c | sort -n -r | head -5
+		Result: 727 80
+			    697 54634
+			    346 49836
+			     61 47110
+			     36 40341
+
+			    So, the top 5 TCP ports are 80, 54634, 49836, 47110, 40341
+
+		TOP 5 UDP ports
+		Command used: sudo tcpdump -n udp -r hw1.pcap | cut -d' ' -f5 | cut -d':' -f1 | cut -d'.' -f5 | sort | uniq -c | sort -n -r | head -5
+		Result:   13178 1900
+				  1925 137
+				  1516 5355
+				  840 5353
+				  399 138
+
+				So, the top 5 UDP ports are 1900, 137, 5355, 5353, 138
+
+1.8 How many TCP packets have the SYN flag set?
+Answer: 75
+		Command Used: sudo tcpdump -n 'tcp[tcpflags] & tcp-syn != 0' -r hw1.pcap | wc -l
+
+
+1.9 How many TCP connection attempts were made?
+Answer: 37
+		Command Used: sudo tcpdump -n 'tcp[13] == 2' -r hw1.pcap | wc -l
+
+
+1.10 Towards which ports were TCP connection attempts made? How many attempts per port?
+Answe: Command Used: sudo tcpdump -n 'tcp[13] == 2' -r hw1.pcap | cut -d' ' -f5 | cut -d':' -f1 | cut -d'.' -f5 | sort | uniq -c
+	  Result: 
+	  1 443
+      1 465
+      33 80
+      2 9100
+
+1.11 How many HTTP GET requests were made? Print the URLs of all HTTP requests for JPG files.
+Answer: 94
+		Command Used: sudo tcpdump -n '(tcp port http) && (tcp[32:4] = 0x47455420)' -r hw1.pcap | wc -l
+
+		To get all HTTP Requests for JPG Files
+		Command Used: sudo tcpdump -n -A '(tcp port http) && (tcp[32:4] = 0x47455420)' -r hw1.pcap | grep GET | rev | cut -d' ' -f2 | rev | grep jpg
+
+		Result:
+		http://pic.leech.it/i/f166c/479246b0asttas.jpg
+		http://pic.leech.it/i/f166c/479246b0asttas.jpg
+		/i/f166c/479246b0asttas.jpg
+		/i/f166c/479246b0asttas.jpg
+		http://ecx.images-amazon.com/images/I/41oZ1XsiOAL._SL500_AA300_.jpg
+		http://ecx.images-amazon.com/images/I/41oZ1XsiOAL._SL500_AA300_.jpg
+		http://www.nature.com/news/2009/090527/images/459492a-i1.0.jpg
+		http://www.nature.com/news/2009/090527/images/459492a-i1.0.jpg
+		/news/2009/090527/images/459492a-i1.0.jpg
+		/news/2009/090527/images/459492a-i1.0.jpg
+
+1.12 When (date and time) was the first and last packet of the trace sent?
+Answer: First packet sent date - 2013-01-12 12:37:42.871346
+		Command Used: sudo tcpdump -n -tttt -r hw1.pcap | head -1
+
+		Last packer send date - 2013-01-14 14:27:03.691498
+		Command Used: sudo tcpdump -n -tttt -r hw1.pcap | tail -1
+
+1.13 What is the brand of the device that sent most of the packets? What is its IP address?
+Answer: 
+	Step 1: Find the mac address of the device i.e most appeared source mac address
+	Command Used: sudo tcpdump -n -e -r hw1.pcap | cut -d' ' -f2 | sort | uniq -c | sort -n -r | head -1
+	Result: 
+		19743 c4:3d:c7:17:6f:9b
+
+	So, MAC address of the device is c4:3d:c7:17:6f:9b
+
+	Step 2: Enter this MAC address in https://macvendors.com/
+	Result: NETGEAR
+
+	Therefore, the brandname of the device is 'NETGEAR'
+
+	Its IP Address: 192.168.0.1
+	Command Used: sudo tcpdump -n ether src c4:3d:c7:17:6f:9b -r hw1.pcap | head -1
+	Result: 12:37:42.871346 ARP, Request who-has 192.168.0.12 tell 192.168.0.1, length 46
+
+1.14 Report the distribution of Ethernet packet sizes (how many packets of size X exist in the trace, for all values of X in the trace).
+Answer: Command Used: sudo tcpdump -n -e -r hw1.pcap | grep length > output1.txt
+		All Ethernet Packets size info will be stored in output1.txt. We need to extract the ethernet packet length from processing the info saved in output1.txt
+
+	Then, run the following python file,
+		file_ = open('output1.txt','r')
+		file_reader = file_.read().strip()
+		file_lines = file_reader.split('\n')
+		dictionary_ = {}
+		for line_ in file_lines:
+			sub = (line_[line_.find('length ')+len('length '):])
+			length_ = int(sub[:sub.find(':')])
+			if length_ in dictionary_:
+				dictionary_[length_] += 1
+			else:
+				dictionary_[length_] = 1
+		print 'Packet_Size\t# of Occurrences'
+		for key in dictionary_:
+			print key,'\t\t',dictionary_[key]
+
+
+	Output:
+
+	Packet_Size	# of Occurrences
+		518 		1
+		1033 		40
+		1034 		6
+		1035 		4
+		527 		158
+		528 		10
+		535 		1
+		539 		162
+		540 		10
+		541 		155
+		542 		10
+		544 		1
+		546 		2
+		548 		1
+		550 		2
+		551 		17
+		552 		1
+		42 			24
+		555 		161
+		556 		10
+		690 		1
+		54 			1
+		568 		1
+		607 		2
+		60 			12190
+		62 			13
+		63 			232
+		64 			887
+		65 			4
+		66 			1046
+		68 			8
+		69 			6
+		70 			3
+		72 			1
+		74 			87
+		75 			8
+		76 			6
+		77 			2
+		1102 		1
+		79 			4
+		592 		1
+		593 		2
+		82 			52
+		84 			43
+		85 			4
+		598 		2
+		87 			14
+		88 			5
+		601 		1
+		602 		32
+		91 			341
+		92 			1740
+		93 			2
+		94 			2
+		95 			2
+		608 		1
+		610 		6
+		611 		2
+		612 		2
+		613 		5
+		614 		2
+		615 		2
+		105 		2
+		106 		4
+		107 		10
+		621 		2
+		110 		180
+		111 		2
+		624 		2
+		628 		5
+		630 		2
+		119 		28
+		120 		121
+		636 		2
+		125 		7
+		127 		15
+		640 		1
+		129 		2
+		1162 		1
+		142 		11
+		144 		1
+		124 		4
+		1170 		1
+		90 			13
+		149 		7
+		154 		10
+		1179 		1
+		156 		1
+		165 		60
+		678 		1
+		167 		62
+		168 		12
+		170 		4
+		171 		1
+		175 		146
+		177 		4
+		178 		1
+		694 		1
+		184 		2
+		698 		22
+		1212 		2
+		704 		2
+		1218 		1
+		195 		1
+		202 		17
+		207 		1
+		208 		2
+		730 		1
+		219 		39
+		220 		2
+		223 		1
+		229 		2
+		231 		36
+		233 		3
+		746 		1
+		236 		2
+		752 		1
+		243 		279
+		244 		4
+		245 		16
+		246 		22
+		247 		3
+		248 		9
+		249 		56
+		252 		2
+		254 		4
+		255 		2
+		257 		2
+		261 		2
+		264 		6
+		265 		2
+		266 		2
+		267 		4
+		268 		2
+		269 		3
+		282 		6
+		284 		9
+		288 		2
+		294 		2
+		817 		5
+		298 		3
+		302 		15
+		816 		8
+		305 		2
+		306 		1
+		307 		12
+		308 		1
+		309 		2
+		310 		2
+		312 		1
+		315 		24
+		317 		1
+		318 		86
+		320 		1
+		321 		2
+		322 		4
+		326 		85
+		328 		7
+		329 		5
+		330 		10
+		331 		2773
+		332 		10
+		333 		6
+		335 		1
+		338 		88
+		340 		2749
+		342 		326
+		344 		3
+		345 		4
+		346 		4
+		347 		1
+		350 		6
+		362 		86
+		372 		1
+		374 		1
+		89 			4
+		383 		2
+		386 		88
+		389 		1
+		390 		87
+		392 		87
+		394 		86
+		395 		2759
+		396 		1
+		398 		85
+		405 		2758
+		412 		1
+		666 		12
+		926 		1
+		417 		1
+		418 		2
+		428 		1
+		429 		1
+		432 		1
+		433 		1
+		952 		1
+		1469 		1
+		446 		1
+		588 		1
+		460 		33
+		760 		1
+		979 		1
+		590 		2
+		475 		164
+		476 		10
+		478 		2
+		479 		1
+		482 		1
+		484 		165
+		485 		10
+		81 			54
+		489 		13
+		1514 		1034
+		679 		1
+		497 		3
+		502 		2
+		596 		1
+		506 		1
+
